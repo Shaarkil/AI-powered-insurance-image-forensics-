@@ -1,0 +1,8 @@
+flask
+pillow
+numpy
+gunicorn
+torch==2.3.1
+transformers==4.41.2
+timm
+opencv-python-headless
