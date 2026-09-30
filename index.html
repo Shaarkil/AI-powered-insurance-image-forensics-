@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><title>AI Forensics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#111;color:#fff;padding:20px;text-align:center}
+.card{background:#222;padding:20px;border-radius:15px;max-width:400px;margin:auto}
+button{background:#0af;color:#fff;border:none;padding:12px 20px;border-radius:8px;width:100%;font-size:16px}
+#result{margin-top:20px;padding:15px;border-radius:10px;display:none}
+.real{background:#0a5}.fake{background:#a00}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Insurance Forensics</h2>
+<input type="file" id="file" accept="image/*"><br><br>
+<button onclick="analyze()">Analyze</button>
+<div id="result"></div>
+</div>
+<script>
+async function analyze(){
+ const f=document.getElementById('file').files[0];
+ if(!f){alert('Select image');return}
+ const fd=new FormData();
+ fd.append('image', f);
+ document.getElementById('result').style.display='block';
+ document.getElementById('result').innerHTML='Analyzing...';
+ const res=await fetch('/analyze',{method:'POST',body:fd});
+ const data=await res.json();
+ const isFake=data.fake_percent>50;
+ document.getElementById('result').className=isFake?'fake':'real';
+ document.getElementById('result').innerHTML=`
+   <h3>${data.verdict}</h3>
+   <p>Real: ${data.real_percent}% | Fake: ${data.fake_percent}%</p>
+   <p>ELA: ${data.metrics.ELA} | Metadata: ${data.metrics.Metadata}</p>
+   <small>${data.details}</small>
+ `;
+}
+</script>
+</body>
+</html>
