@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{background:#020617;color:white;font-family:Arial;text-align:center;padding:20px}.card{background:#1e293b;padding:20px;border-radius:15px;max-width:500px;margin:auto} button{background:#3b82f6;color:white;padding:12px 25px;border:none;border-radius:8px;font-weight:bold} #res{margin-top:15px}</style>
+</head><body>
+<h2>AI-Powered Insurance Image Forensics</h2>
+<p>Detects Fraud, Tampering & AI-generated claims</p>
+<div class="card">
+<input type="file" id="f" accept="image/*">
+<br><br><button onclick="go()">Analyze Image</button>
+<div id="res" style="padding:15px;background:#0f172a;border-radius:10px;margin-top:15px">Ready...</div>
+</div>
+<script>
+async function go(){
+  const file=document.getElementById('f').files[0];
+  if(!file)return alert("Choose file first!");
+  if(file.size>4000000)return alert("File too big! Use <4MB, take screenshot of car instead");
+  document.getElementById('res').innerHTML="⏳ Analyzing... wait 5 sec, don't press again!";
+  const fd=new FormData(); fd.append("file", file);
+  try{
+    const r=await fetch("/analyze",{method:"POST",body:fd});
+    const html=await r.text();
+    // extract result box
+    const m=html.match(/<div style="margin:15px[^]*?<\/div>\s*<\/div>/s);
+    document.getElementById('res').innerHTML=m?m[0]:html;
+  }catch(e){document.getElementById('res').innerHTML="❌ Timeout - Render woke up, press Analyze again! "+e}
+}
+</script>
+</body></html>
