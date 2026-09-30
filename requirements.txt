@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-python-multipart
-Pillow==11.1.0
-numpy
-opencv-python-headless
-jinja2
