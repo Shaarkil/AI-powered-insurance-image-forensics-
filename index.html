@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Insurance Forensics AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#0f172a;color:white;padding:20px;text-align:center}
+.card{background:#1e293b;padding:20px;border-radius:15px;max-width:500px;margin:auto}
+input{margin:20px 0}
+button{background:#38bdf8;color:black;padding:12px 25px;border:none;border-radius:8px;font-weight:bold}
+#result{margin-top:20px;text-align:left;background:#0f172a;padding:15px;border-radius:10px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h2>AI-Powered Insurance Image Forensics</h2>
+<p>Detects Fraud, Tampering & AI-generated claims</p>
+<div class="card">
+<input type="file" id="file" accept="image/*">
+<br>
+<button onclick="analyze()">Analyze Image</button>
+<div id="result">Upload an insurance claim image to check.</div>
+</div>
+<script>
+async function analyze(){
+ let f=document.getElementById('file').files[0];
+ if(!f){alert('Select image');return}
+ document.getElementById('result').innerText='Analyzing...';
+ let fd=new FormData(); fd.append('file', f);
+ let res=await fetch('/analyze',{method:'POST', body:fd});
+ let data=await res.json();
+ document.getElementById('result').innerText=JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
