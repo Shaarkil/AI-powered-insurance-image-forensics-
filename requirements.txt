@@ -1,0 +1,6 @@
+flask
+pillow==10.4.0
+numpy==1.26.4
+gunicorn
+onnxruntime==1.18.1
+requests
