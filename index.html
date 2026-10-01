@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V30 - Original Camera Only</title>
+<style>
+body{font-family:system-ui;background:#0f0f0f;color:#fff;margin:0;padding:16px}
+.card{max-width:480px;margin:auto;background:#1c1c1e;border-radius:20px;padding:20px;border:1px solid #333}
+h2{margin:0 0 6px;font-size:22px}
+.sub{color:#aaa;font-size:13px;margin-bottom:16px;line-height:1.4}
+.warn{background:#3a2000;border:1px solid #ff9500;border-radius:12px;padding:12px;font-size:13px;margin-bottom:16px}
+.warn b{color:#ff9500}
+.btn{width:100%;padding:16px;border:none;border-radius:14px;font-weight:700;font-size:16px;cursor:pointer;margin-top:10px}
+.cam{background:#fff;color:#000}
+.upload{background:#2c2c2e;color:#888;font-size:13px}
+.result{margin-top:18px;padding:14px;border-radius:14px;display:none}
+.result.HIGH{background:#3a0a0a;border:1px solid #ff3b30}
+.result.LOW{background:#0a2a12;border:1px solid #30d158}
+.result.MEDIUM{background:#332a00;border:1px solid #ffd60a;color:#fff}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:12px}
+.metrics div{background:#2c2c2e;padding:8px;border-radius:8px}
+#preview{width:100%;border-radius:12px;margin-top:12px;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Vehicle Photo Check</h2>
+<div class="sub">System only accepts <b>live camera photo</b>. No gallery, no WhatsApp, no screenshots.</div>
+
+<div class="warn">
+<b>⚠️ IMPORTANT:</b> Please take photo with <b>CAMERA NOW</b>. Do NOT upload from gallery.<br>
+• WhatsApp / Telegram / Google Drive = <b>REJECTED</b><br>
+• Screenshot / Document = <b>REJECTED</b><br>
+• Internet image = <b>REJECTED</b><br>
+• Only original phone camera = <b>ACCEPTED</b>
+</div>
+
+<input type="file" id="camInput" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="galInput" accept="image/*" style="display:none">
+
+<button class="btn cam" onclick="document.getElementById('camInput').click()">📸 TAKE PHOTO WITH CAMERA NOW</button>
+<button class="btn upload" onclick="document.getElementById('galInput').click()">Gallery upload (will be flagged REJECT)</button>
+
+<img id="preview">
+<div id="res" class="result"></div>
+
+<div id="log" style="font-size:11px;color:#666;margin-top:12px"></div>
+</div>
+
+<script>
+const cam = document.getElementById('camInput');
+const gal = document.getElementById('galInput');
+const res = document.getElementById('res');
+const preview = document.getElementById('preview');
+const log = document.getElementById('log');
+
+function send(file, source){
+  preview.src = URL.createObjectURL(file);
+  preview.style.display='block';
+  res.style.display='block';
+  res.className='result MEDIUM';
+  res.innerHTML=`Checking...<br><small>Source: ${source} | Size: ${(file.size/1024).toFixed(0)}KB</small>`;
+  log.innerHTML=`Uploading as ${source}...`;
+  const fd = new FormData(); fd.append('image', file);
+  fetch('/analyze', {method:'POST', body:fd})
+ .then(r=>r.json()).then(d=>{
+    res.className='result '+d.risk_tier;
+    res.innerHTML=`
+      <div class="badge">${d.chain_of_custody}</div>
+      <div style="font-size:18px;font-weight:800">${d.verdict}</div>
+      <div style="font-size:12px;margin-top:6px">Real: ${d.real_percent}% | Fake: ${d.fake_percent}% ${d.onnx_percent? '| AI Model: '+d.onnx_percent+'%' : ''}</div>
+      <div class="metrics">
+        <div>Noise: ${d.metrics.Noise}</div>
+        <div>PRNU: ${d.metrics.PRNU_E}</div>
+        <div>EXIF: ${d.metrics.EXIF}</div>
+        <div>ELA: ${d.metrics.ELA}</div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:#aaa">Flags: ${d.flags.join(', ')}</div>
+      <img src="${d.heatmap}" style="width:100%;border-radius:8px;margin-top:10px;opacity:0.8">
+    `;
+    log.innerHTML=`PRNU: ${d.prnu_status} | C2PA: ${d.c2pa_status}`;
+  });
+}
+
+cam.addEventListener('change', e=>{ if(e.target.files[0]) send(e.target.files[0], 'LIVE CAMERA') });
+gal.addEventListener('change', e=>{ if(e.target.files[0]) send(e.target.files[0], 'GALLERY - WILL BE REJECTED') });
+</script>
+</body>
+</html>
