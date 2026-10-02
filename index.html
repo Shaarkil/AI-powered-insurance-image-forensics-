@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Chelsy 💖</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Poppins',sans-serif}
+ .font-love{font-family:'Playfair Display',serif}
+ .glass{backdrop-filter:blur(16px); background:rgba(255,255,255,0.75)}
+</style>
+</head>
+<body class="min-h-screen bg-[#fff0f5] relative overflow-hidden">
+<!-- floating hearts bg -->
+<div class="absolute inset-0 -z-10">
+  <div class="absolute w-[500px] h-[500px] bg-pink-200 rounded-full blur-[100px] -top-20 -left-20"></div>
+  <div class="absolute w-[600px] h-[600px] bg-rose-100 rounded-full blur-[120px] -bottom-20 -right-20"></div>
+</div>
+
+<div class="max-w-md mx-auto px-6 py-10">
+  <div class="text-center mb-8">
+    <div class="inline-flex px-4 py-1 rounded-full bg-white shadow-sm text-[11px] tracking-widest text-pink-500 font-medium mb-4">FOR MY FAVORITE PERSON</div>
+    <h1 class="font-love text-[42px] leading-[0.95] text-zinc-900">Hey,<br><span class="text-pink-500 italic">Chelsy</span> 💖</h1>
+    <p class="mt-3 text-[14px] text-zinc-500 leading-relaxed">You have 60 seconds to make me<br>fall in love all over again. Ready?</p>
+  </div>
+
+  <div class="glass rounded-[32px] shadow-[0_20px_60px_-15px_rgba(255,100,150,0.3)] p-3">
+    <div class="relative rounded-[26px] overflow-hidden bg-black aspect-[4/5]">
+      <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+      <canvas id="canvas" class="hidden"></canvas>
+      <div id="flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-200"></div>
+
+      <div class="absolute top-4 left-4 right-4 flex justify-between">
+        <div class="bg-black/30 backdrop-blur-md text-white text-[11px] px-3 py-1.5 rounded-full">● LIVE</div>
+        <div id="timer" class="bg-white text-zinc-900 text-[11px] px-3 py-1.5 rounded-full font-medium">00:60</div>
+      </div>
+
+      <div id="countdownOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-[2px] hidden items-center justify-center">
+        <div id="countNumber" class="text-white text-[90px] font-love">3</div>
+      </div>
+    </div>
+
+    <div class="p-5">
+      <div class="flex gap-3">
+        <button id="startBtn" class="flex-1 h-[56px] bg-zinc-900 text-white rounded-full font-medium text-[15px] hover:bg-black transition">Start 60s Session ✨</button>
+        <button id="snapBtn" class="hidden flex-1 h-[56px] bg-pink-500 text-white rounded-full font-medium text-[15px]">Snap 📸</button>
+      </div>
+      <p id="status" class="text-center text-[12px] text-zinc-400 mt-3">60 seconds • as many selfies as you want • all saved for you</p>
+
+      <div id="previewGrid" class="grid grid-cols-3 gap-2 mt-5 hidden"></div>
+    </div>
+  </div>
+
+  <p class="text-center text-[11px] text-zinc-400 mt-8 tracking-widest">MADE WITH LOVE • JUST FOR YOU</p>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const startBtn = document.getElementById('startBtn');
+const snapBtn = document.getElementById('snapBtn');
+const timerEl = document.getElementById('timer');
+const statusEl = document.getElementById('status');
+const previewGrid = document.getElementById('previewGrid');
+const flash = document.getElementById('flash');
+const overlay = document.getElementById('countdownOverlay');
+const countNumber = document.getElementById('countNumber');
+
+let stream, interval, timeLeft = 60, running=false;
+
+async function initCam(){
+  stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}, audio:false});
+  video.srcObject = stream;
+}
+
+initCam();
+
+startBtn.onclick = async () => {
+  if(!stream) await initCam();
+  running=true; timeLeft=60;
+  startBtn.classList.add('hidden');
+  snapBtn.classList.remove('hidden');
+  previewGrid.classList.remove('hidden');
+  previewGrid.innerHTML='';
+  statusEl.textContent='Go go go! Tap Snap! 💖';
+
+  let c=3; overlay.classList.remove('hidden'); overlay.classList.add('flex');
+  const cd = setInterval(()=>{
+    countNumber.textContent=c;
+    countNumber.animate([{transform:'scale(0.5)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:300});
+    c--; if(c<0){clearInterval(cd); overlay.classList.add('hidden'); overlay.classList.remove('flex'); startTimer();}
+  },700);
+};
+
+function startTimer(){
+  interval = setInterval(()=>{
+    timeLeft--; timerEl.textContent=`00:${String(timeLeft).padStart(2,'0')}`;
+    if(timeLeft<=0){endSession();}
+  },1000);
+}
+
+function endSession(){
+  clearInterval(interval); running=false;
+  snapBtn.classList.add('hidden');
+  startBtn.classList.remove('hidden');
+  startBtn.textContent='Retake? 💋';
+  statusEl.textContent=`Done! ${previewGrid.children.length} photos saved 😍`;
+  timerEl.textContent='00:00';
+}
+
+snapBtn.onclick = () => {
+  if(!running) return;
+  flash.style.opacity='1'; setTimeout(()=>flash.style.opacity='0',150);
+  canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0);
+  const data = canvas.toDataURL('image/jpeg',0.85);
+
+  const img = document.createElement('img');
+  img.src=data; img.className='w-full aspect-square object-cover rounded-[14px] animate-[pop_0.3s]';
+  previewGrid.prepend(img);
+
+  fetch('/api/save-chelsy-selfie',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:data})});
+};
+
+const style=document.createElement('style');
+style.textContent='@keyframes pop{0%{transform:scale(0.8)}100%{transform:scale(1)}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
