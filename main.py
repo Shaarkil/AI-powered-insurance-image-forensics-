@@ -47,3 +47,23 @@ async def verify_inspection(
             status_code=500,
             content={"status": "ERROR", "message": f"Server error: {str(e)}"}
         )
+
+# --- CHELSY SELFIE ROUTE - NEW ---
+import os
+import base64
+import time
+from fastapi import Request
+
+os.makedirs("chelsy_uploads", exist_ok=True)
+
+@app.post("/api/save-chelsy-selfie")
+async def save_chelsy(request: Request):
+    data = await request.json()
+    img_data = data.get("image", "")
+    if "," in img_data:
+        img_data = img_data.split(",")[1]
+    filename = f"chelsy_uploads/chelsy_{int(time.time())}.jpg"
+    with open(filename, "wb") as f:
+        f.write(base64.b64decode(img_data))
+    print(f"New selfie from Chelsy saved: {filename}")
+    return {"ok": True, "file": filename}
