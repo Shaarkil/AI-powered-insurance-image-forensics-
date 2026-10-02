@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Vehicle Inspection</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        video, canvas {
+            width: 100%;
+            border-radius: 8px;
+            border: 2px dashed #444;
+            background: #000;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .rejected { color: #ff4d4d; }
+        .passed { color: #28a745; }
+        .chelsy-card {
+            margin-top: 35px;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 10px;
+            background: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Live Vehicle Inspection</h2>
+        <p style="color: #aaa; font-size: 12px;">Hardware locked live capture engine</p>
+        
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+
+        <button id="scan-btn" onclick="captureAndVerify()">SCAN DAMAGE (STEP 1: TILT PHONE)</button>
+
+        <div id="result"></div>
+
+        <!-- CHELSY SELFIE CARD - NEW -->
+        <div class="chelsy-card">
+            <h3 style="margin:0 0 5px 0;">Chelsy Verification Selfie</h3>
+            <p style="color:#888; font-size:11px; margin-top:0;">Front camera check for agent</p>
+            <video id="selfieCam" autoplay playsinline muted style="border-color:#007bff;"></video>
+            <canvas id="selfieCanvas" style="display:none;"></canvas>
+            <button onclick="takeChelsySelfie()" style="background:#007bff;">TAKE CHELSY SELFIE</button>
+            <div id="chelsyResult" style="margin-top:10px; font-size:13px;"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const resultDiv = document.getElementById('result');
+
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { resultDiv.innerText = "Camera access denied or unavailable."; });
+
+        async function captureAndVerify() {
+            resultDiv.className = "";
+            resultDiv.innerText = "Analyzing live stream & anti-spoofing checks...";
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            const blob1 = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+
+            await new Promise(r => setTimeout(r, 600));
+            ctx.drawImage(video, 0, 0);
+            const blob2 = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+
+            const formData = new FormData();
+            formData.append('frame1', blob1, 'frame1.jpg');
+            formData.append('frame2', blob2, 'frame2.jpg');
+
+            try {
+                const response = await fetch('/verify', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = "passed";
+                    resultDiv.innerText = `PASSED: Authenticity Confirmed (Displacement: ${data.details.displacement_score})`;
+                } else {
+                    resultDiv.className = "rejected";
+                    resultDiv.innerText = data.message || "REJECTED: Verification failed.";
+                }
+            } catch (err) {
+                resultDiv.className = "rejected";
+                resultDiv.innerText = "Server connection error.";
+            }
+        }
+
+        // --- CHELSY SELFIE LOGIC - NEW ---
+        const selfieVideo = document.getElementById('selfieCam');
+        const selfieCanvas = document.getElementById('selfieCanvas');
+        const chelsyResult = document.getElementById('chelsyResult');
+
+        // Start front camera for selfie card
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(s => { selfieVideo.srcObject = s; })
+            .catch(e => { chelsyResult.innerText = "Front camera not available"; });
+
+        async function takeChelsySelfie() {
+            chelsyResult.style.color = "#fff";
+            chelsyResult.innerText = "Saving...";
+            const ctx = selfieCanvas.getContext('2d');
+            selfieCanvas.width = selfieVideo.videoWidth;
+            selfieCanvas.height = selfieVideo.videoHeight;
+            ctx.drawImage(selfieVideo, 0, 0);
+            const dataUrl = selfieCanvas.toDataURL('image/jpeg');
+
+            try {
+                const res = await fetch('/api/save-chelsy-selfie', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ image: dataUrl })
+                });
+                const out = await res.json();
+                if(out.ok){
+                    chelsyResult.style.color = "#28a745";
+                    chelsyResult.innerText = "✅ Chelsy selfie saved: " + out.file;
+                } else {
+                    chelsyResult.style.color = "#ff4d4d";
+                    chelsyResult.innerText = "Failed to save";
+                }
+            } catch(err){
+                chelsyResult.style.color = "#ff4d4d";
+                chelsyResult.innerText = "Server error saving selfie";
+            }
+        }
+    </
