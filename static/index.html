@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-Powered Insurance Image Forensics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-brand-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-semibold text-slate-900 leading-tight">AI Image Forensics</h1>
+          <p class="text-xs text-slate-500">Insurance Claim Intelligence</p>
+        </div>
+      </div>
+      <div class="hidden sm:flex items-center gap-2 text-sm text-slate-500">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          System Online
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+    <!-- Hero -->
+    <div id="intro-section" class="mb-10">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-4">
+          Instant Vehicle Claim Analysis
+        </h2>
+        <p class="text-lg text-slate-600 leading-relaxed">
+          Take a live photo of the vehicle to automatically extract registration plates, detect damage, classify vehicle details, and assess fraud risk — in seconds.
+        </p>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div id="upload-section" class="max-w-2xl mx-auto mb-12">
+      
+      <div id="upload-prompt" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center">
+        <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-brand-50 flex items-center justify-center">
+          <svg class="w-8 h-8 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Take Live Photo of Vehicle</h3>
+        <p class="text-slate-500 mb-8 text-sm">Live camera capture only — this helps prevent submission of edited or fraudulent images</p>
+
+        <div class="flex justify-center">
+          <label class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-sm cursor-pointer transition-colors text-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Open Camera & Take Photo
+            <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" />
+          </label>
+        </div>
+
+        <p class="text-xs text-slate-400 mt-6">Rear camera will be used • Live capture required</p>
+      </div>
+
+      <!-- Preview -->
+      <div id="preview-container" class="hidden mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center">
+        <img id="preview-image" class="max-h-72 mx-auto rounded-xl shadow-md mb-4" alt="Preview" />
+        <p id="file-name" class="text-sm text-slate-600 mb-5">Live captured photo</p>
+        
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button id="analyze-btn" 
+                  class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-xl shadow-sm transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Analyze Claim Image
+          </button>
+          
+          <button id="retake-btn" 
+                  class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors">
+            Retake Photo
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading-state" class="hidden mt-8 text-center">
+        <div class="inline-flex items-center gap-3 px-5 py-3 bg-white rounded-xl shadow-sm border border-slate-200">
+          <svg class="animate-spin h-5 w-5 text-brand-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-sm font-medium text-slate-700">Running forensic analysis...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="hidden">
+      
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p class="text-sm text-slate-500 mb-1">Claim Inspection Report</p>
+            <h3 class="text-xl font-semibold text-slate-900" id="result-audit-id">—</h3>
+          </div>
+          <div id="risk-badge-container"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-4 border-b border-slate-100">
+              <h4 class="text-sm font-medium text-slate-700">Submitted Image</h4>
+            </div>
+            <div class="p-4">
+              <img id="result-image" class="w-full rounded-lg object-contain max-h-80" alt="Analyzed vehicle" />
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Vehicle Identification</h4>
+            
+            <div class="mb-6">
+              <p class="text-sm text-slate-500 mb-2">Extracted Registration Plate</p>
+              <div id="plate-display" class="inline-flex items-center px-5 py-3 bg-brand-600 text-white text-2xl font-bold tracking-widest rounded-xl shadow-sm">
+                —
+              </div>
+              <p class="mt-2 text-sm text-slate-500">
+                OCR Confidence: <span id="ocr-confidence" class="font-semibold text-slate-800">—</span>
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">Primary Body Color</p>
+                <p id="body-color" class="text-base font-semibold text-slate-900">—</p>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">Body Type Classification</p>
+                <p id="body-type" class="text-base font-semibold text-slate-900">—</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Damage Assessment</h4>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">Panel Damage Status</p>
+                <p id="damage-status" class="text-base font-semibold">—</p>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-xs text-slate-500 mb-1">Affected Panels</p>
+                <p id="affected-panels" class="text-base font-semibold text-slate-900">—</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Performance</h4>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Processing Latency</span>
+                <span id="latency" class="text-sm font-semibold text-slate-900">—</span>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+              <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Fraud Risk Evaluation</h4>
+              <div id="fraud-details" class="text-sm text-slate-700">—</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <button id="new-analysis-btn" 
+                class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 rounded-xl transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Analyze Another Image
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-200 mt-16 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-sm text-slate-500">
+      AI-Powered Insurance Image Forensics • Built for Kenyan Insurance Claims
+    </div>
+  </footer>
+
+  <script>
+    const cameraInput = document.getElementById('camera-input');
+    const uploadPrompt = document.getElementById('upload-prompt');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const fileName = document.getElementById('file-name');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const retakeBtn = document.getElementById('retake-btn');
+    const loadingState = document.getElementById('loading-state');
+    const resultsSection = document.getElementById('results-section');
+    const introSection = document.getElementById('intro-section');
+    const uploadSection = document.getElementById('upload-section');
+    const newAnalysisBtn = document.getElementById('new-analysis-btn');
+
+    let selectedFile = null;
+
+    cameraInput.addEventListener('change', (e) => {
+      if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please capture an image.');
+        return;
+      }
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        fileName.textContent = 'Live captured photo';
+        uploadPrompt.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    retakeBtn.addEventListener('click', () => {
+      selectedFile = null;
+      cameraInput.value = '';
+      previewImage.src = '';
+      previewContainer.classList.add('hidden');
+      uploadPrompt.classList.remove('hidden');
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      previewContainer.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      analyzeBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await fetch('/assess', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+        const data = await response.json();
+        displayResults(data, previewImage.src);
+      } catch (err) {
+        console.error(err);
+        alert('Analysis failed. Please try again.\n\n' + err.message);
+        loadingState.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    function displayResults(data, imageSrc) {
+      loadingState.classList.add('hidden');
+      uploadSection.classList.add('hidden');
+      introSection.classList.add('hidden');
+      resultsSection.classList.remove('hidden');
+
+      document.getElementById('result-image').src = imageSrc;
+
+      const auditId = data.audit_id || data.auditId || data.claim_id || data.id || '—';
+      document.getElementById('result-audit-id').textContent = auditId;
+
+      const plate = data.registration_plate || data.plate || data.extracted_plate || data.plate_number || 'NO_MATCH_DETECTED';
+      document.getElementById('plate-display').textContent = plate;
+
+      let ocrConf = data.ocr_confidence ?? data.ocrConfidence ?? data.confidence;
+      if (typeof ocrConf === 'number') {
+        ocrConf = (ocrConf <= 1 ? (ocrConf * 100).toFixed(1) : ocrConf.toFixed(1)) + '%';
+      }
+      document.getElementById('ocr-confidence').textContent = ocrConf || '—';
+
+      document.getElementById('body-color').textContent = data.primary_body_color || data.body_color || data.color || '—';
+      document.getElementById('body-type').textContent = data.body_type || data.body_type_classification || data.vehicle_type || '—';
+
+      const damageStatus = data.panel_damage_status || data.damage_status || data.damage || '—';
+      const damageEl = document.getElementById('damage-status');
+      damageEl.textContent = damageStatus;
+      
+      if (String(damageStatus).toUpperCase().includes('NONE') || String(damageStatus).toUpperCase().includes('CLEAN')) {
+        damageEl.className = 'text-base font-semibold text-emerald-600';
+      } else {
+        damageEl.className = 'text-base font-semibold text-rose-600';
+      }
+
+      document.getElementById('affected-panels').textContent = data.affected_panels || data.panels || 'No Defect Detected';
+
+      let latency = data.processing_latency || data.latency || data.processing_time;
+      if (typeof latency === 'number') latency = latency.toFixed(2) + ' ms';
+      document.getElementById('latency').textContent = latency || '—';
+
+      const riskLevel = data.fraud_risk || data.risk_level || data.fraud_risk_level || data.risk || 'UNKNOWN';
+      const riskStatus = data.claim_status || data.status || data.evaluation || '';
+      
+      const riskContainer = document.getElementById('risk-badge-container');
+      let badgeClass = 'bg-slate-100 text-slate-700';
+      let riskText = String(riskLevel).toUpperCase();
+
+      if (riskText.includes('LOW')) {
+        badgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      } else if (riskText.includes('MEDIUM')) {
+        badgeClass = 'bg-amber-50 text-amber-700 border border-amber-200';
+      } else if (riskText.includes('HIGH') || riskText.includes('CRITICAL')) {
+        badgeClass = 'bg-rose-50 text-rose-700 border border-rose-200';
+      }
+
+      riskContainer.innerHTML = `
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${badgeClass}">
+          ${riskText}
+          \( {riskStatus ? `<span class="px-2 py-0.5 rounded-md bg-white/60 text-xs"> \){riskStatus}</span>` : ''}
+        </div>
+      `;
+
+      document.getElementById('fraud-details').innerHTML = `
+        <p class="font-medium text-slate-900 mb-1">${riskLevel}</p>
+        <p class="text-slate-600">${riskStatus || 'Evaluation complete'}</p>
+      `;
+    }
+
+    newAnalysisBtn.addEventListener('click', () => {
+      selectedFile = null;
+      cameraInput.value = '';
+      previewImage.src = '';
+      uploadPrompt.classList.remove('hidden');
+      previewContainer.classList.add('hidden');
+      resultsSection.classList.add('hidden');
+      uploadSection.classList.remove('hidden');
+      introSection.classList.remove('hidden');
+      analyzeBtn.disabled = false;
+    });
+  </script>
+</body>
+  </html>
